@@ -1,22 +1,38 @@
-import { tab } from '@testing-library/user-event/dist/tab';
 import React, { useState } from 'react';
+import { Provider, useDispatch, useSelector} from 'react-redux'
 //@ts-ignore
-import styles from './App.module.css'
-import Button, {ButtonType} from './Components/Button';
+
+import styles from './App.module.css';
+import ThemeProvider from './Context/ThemeContext/Provider';
+import Router from './Pages/Router';
+import store from './Redux/store';
+import { changeTheme } from './Redux/reducers/themeReducer';
+import themeSelectors from './Redux/selectors/themeSelectors';
 
 
-export const App = () => {
+const App = () => {
+  const [value, setValue] = useState<string>("");
+  const onChange = (inputValue: string) => {
+    setValue(inputValue);
+  };
+  const theme = useSelector(themeSelectors.getTheme)
+  const dispatch = useDispatch();
+  const onChangeTheme = ( ) => {
+    dispatch(changeTheme())
+  }
   return (
-    <div className={styles.app}>
-      <Button type={ButtonType.Primary} title={'Primary'} onClick={() => alert('Primary')}/>
-      <Button type={ButtonType.Secondary} title={'Secondary'} onClick={() => alert('Secondary')} />
-      <Button type={ButtonType.Error} title={'Error'} onClick={() => alert('Error')} />
-      <Button type={ButtonType.Primary} title={'Primary'} onClick={() => alert('Primary')} disabled/>
-      <Button type={ButtonType.Secondary} title={'Secondary'} onClick={() => alert('Secondary')}  disabled/>
-      <Button type={ButtonType.Error} title={'Error'} onClick={() => alert('Error')} disabled/>
-            
-      </div>
-  );
+    <ThemeProvider theme={theme} onChangeTheme={onChangeTheme}>
+      <Router/>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+const AppWithStore = () => {
+  return (
+    <Provider store={store}>
+      <App/>
+    </Provider>
+  )
+}
+
+export default AppWithStore;
